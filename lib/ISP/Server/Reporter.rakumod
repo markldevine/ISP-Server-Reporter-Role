@@ -4,22 +4,6 @@ use ISP::Server::Reporter::Field;
 use ISP::dsmadmc;
 use Prettier::Table;
 
-my regex date-time-regex    {
-                                ^
-                                $<month>        = (\d\d)
-                                '/'
-                                $<day-of-month> = (\d\d)
-                                '/'
-                                $<year>         = (\d+)
-                                \s+
-                                $<hour>         = (\d\d)
-                                ':'
-                                $<minute>       = (\d\d)
-                                ':'
-                                $<second>       = (\d\d)
-                                $
-                            }
-
 has Str:D   $.isp-server                        is required;
 has Str:D   $.isp-admin                         is required;
 has Int:D   $.interval                          = 58;

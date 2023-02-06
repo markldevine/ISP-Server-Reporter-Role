@@ -1,7 +1,6 @@
 #!/usr/bin/env raku
 
 use ISP::Server::Reporter;
-use Prettier::Table;
 
 my regex date-time-regex    {
                                 ^
@@ -131,7 +130,6 @@ sub MAIN (
                                     :$detailed,
                                     :$client-name,
                                   );
-#dd $reporter;
     $reporter.loop;
 }
 
