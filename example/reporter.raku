@@ -115,7 +115,7 @@ sub MAIN (
     @fields.push:   ISP::Server::Reporter::Field.new(:name('Client Name'),                  :alignment('l'));
     @fields.push:   ISP::Server::Reporter::Field.new(:name('Media Access Status'),          :alignment('c'))    if $detailed;
     @fields.push:   ISP::Server::Reporter::Field.new(:name('User Name'),                    :alignment('c'))    if $detailed;
-    @fields.push:   ISP::Server::Reporter::Field.new(:name('Date/Time First Data Sent'),    :alignment('r'))    if $detailed;
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Date/Time First Data Sent'),    :alignment('c'))    if $detailed;
     @fields.push:   ISP::Server::Reporter::Field.new(:name('Proxy By Storage Agent'),       :alignment('c'))    if $detailed;
     @fields.push:   ISP::Server::Reporter::Field.new(:name('Actions'),                      :alignment('c'))    if $detailed;
     @fields.push:   ISP::Server::Reporter::Field.new(:name('Failover Mode'),                :alignment('c'))    if $detailed;
