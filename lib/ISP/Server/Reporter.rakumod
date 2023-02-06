@@ -38,36 +38,36 @@ method load-fields (Str:D @fields) {
     die unless %!fields.elems;
 }
 
-method align-fields { ... }
+method align-fields () { ... }
 
-method process-rows { ... }
+method process-rows () { ... }
 
-method loop {
-    my $delay       = $!interval;
-    my $counter     = $!count;
+method loop () {
+    my $delay       = self.interval;
+    my $counter     = self.count;
     my $infinity    = False;
     if $counter == 0 {
         $infinity   = True;
         $counter++;
     }
     $delay          = 5                 if 0 < $delay < 5;
-    my $dsmadmc     = ISP::dsmadmc.new(:$isp-server, :$isp-admin);
+    my $dsmadmc     = ISP::dsmadmc.new(:$!isp-server, :$!isp-admin);
     my $table;
     repeat {
-        my @records = $dsmadmc.execute(@command);
+        my @records = $dsmadmc.execute(self.command);
         return Nil  unless @records.elems;
 
         $table = Prettier::Table.new:
-            title => 'IBM Spectrum Protect: ' ~ $isp-server ~ ' Sessions [' ~ DateTime(now).local.hh-mm-ss ~ ']',
-            field-names => %!field.keys,
-            align       => %!field.kv,
+            title => 'IBM Spectrum Protect: ' ~ $!isp-server ~ ' Sessions [' ~ DateTime(now).local.hh-mm-ss ~ ']',
+            field-names => self.fields.keys,
+            align       => self.fields.kv,
         ;
-        $table.hrules(Prettier::Table::Constrains::ALL) if $grid;
+        $table.hrules(Prettier::Table::Constrains::ALL) if self.grid;
         self.process-rows(@records);
-        run '/usr/bin/clear'                if $clear;
+        run '/usr/bin/clear'                if self.clear;
         put $table;
         --$counter                          unless $infinity;
-        sleep $interval                     if $interval && $counter;
+        sleep self.interval                 if self.interval && $counter;
     } until $counter < 1;
 }
 

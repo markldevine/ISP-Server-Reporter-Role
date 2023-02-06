@@ -3,7 +3,6 @@
 use lib '/home/mdevine/github.com/ISP-Server-Reporter-Role/lib';
 
 use ISP::Server::Reporter;
-use ISP::dsmadmc;
 use Prettier::Table;
 
 my @standard                    = [
