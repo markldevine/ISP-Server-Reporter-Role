@@ -1,7 +1,5 @@
 #!/usr/bin/env raku
 
-use lib '/home/mdevine/github.com/ISP-Server-Reporter-Role/lib';
-
 use ISP::Server::Reporter;
 use Prettier::Table;
 
@@ -24,6 +22,7 @@ my regex date-time-regex    {
 class Reporter does ISP::Server::Reporter {
 
     has $.detailed;
+    has $.client-name;
 
     method process-rows (@sessions) {
         my Str      $session-number;                                        ##                Sess Number: 29,057
@@ -44,6 +43,10 @@ class Reporter does ISP::Server::Reporter {
 
         my $row;
         for @sessions -> $session {
+            $client-name                    = Nil;  $client-name            = $session{'Client Name'}.Str               if $session{'Client Name'};
+            if self.client-name {
+                next unless self.client-name.fc eq $client-name.fc;
+            }
             $session-number                 = Nil;  $session-number         = $session{'Sess Number'}.Str               if $session{'Sess Number'};
             $communication-method           = Nil;  $communication-method   = $session{'Comm. Method'}.Str              if $session{'Comm. Method'};
             $session-state                  = Nil;  $session-state          = $session{'Sess State'}.Str                if $session{'Sess State'};
@@ -52,7 +55,6 @@ class Reporter does ISP::Server::Reporter {
             $bytes-received                 = Nil;  $bytes-received         = $session{'Bytes Recvd'}.Str               if $session{'Bytes Recvd'};
             $session-type                   = Nil;  $session-type           = $session{'Sess Type'}.Str                 if $session{'Sess Type'};
             $platform                       = Nil;  $platform               = $session{'Platform'}.Str                  if $session{'Platform'};
-            $client-name                    = Nil;  $client-name            = $session{'Client Name'}.Str               if $session{'Client Name'};
             $media-access-status            = Nil;  $media-access-status    = $session{'Media Access Status'}.Str       if $session{'Media Access Status'};
             $user-name                      = Nil;  $user-name              = $session{'User Name'}.Str                 if $session{'User Name'};
             $date-time-first-data-sent      = Nil;
@@ -98,26 +100,26 @@ sub MAIN (
     Bool    :$grid,                                 #= Full table grid
     Bool    :$clear,                                #= Clear the screen with each iteration
     Bool    :$detailed,                             #= FORMAT=DETAILED
-    Str     :$node,                                 #= ISP NODE name
+    Str     :$client-name,                          #= ISP CLIENT/NODE name
 ) {
     my @command     = ['QUERY', 'SESSION'];
     @command.push:  'FORMAT=DETAILED'   if $detailed;
     my @fields;
     @fields.push:   ISP::Server::Reporter::Field.new(:name('Sess Number'),                  :alignment('r'));
-    @fields.push:   ISP::Server::Reporter::Field.new(:name('Comm. Method'),                 :alignment('r'));
-    @fields.push:   ISP::Server::Reporter::Field.new(:name('Sess State'),                   :alignment('r'));
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Comm. Method'),                 :alignment('c'));
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Sess State'),                   :alignment('c'));
     @fields.push:   ISP::Server::Reporter::Field.new(:name('Wait Time'),                    :alignment('r'));
     @fields.push:   ISP::Server::Reporter::Field.new(:name('Bytes Sent'),                   :alignment('r'));
     @fields.push:   ISP::Server::Reporter::Field.new(:name('Bytes Recvd'),                  :alignment('r'));
-    @fields.push:   ISP::Server::Reporter::Field.new(:name('Sess Type'),                    :alignment('r'));
-    @fields.push:   ISP::Server::Reporter::Field.new(:name('Platform'),                     :alignment('r'));
-    @fields.push:   ISP::Server::Reporter::Field.new(:name('Client Name'),                  :alignment('r'));
-    @fields.push:   ISP::Server::Reporter::Field.new(:name('Media Access Status'),          :alignment('r'))    if $detailed;
-    @fields.push:   ISP::Server::Reporter::Field.new(:name('User Name'),                    :alignment('r'))    if $detailed;
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Sess Type'),                    :alignment('c'));
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Platform'),                     :alignment('c'));
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Client Name'),                  :alignment('l'));
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Media Access Status'),          :alignment('c'))    if $detailed;
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('User Name'),                    :alignment('c'))    if $detailed;
     @fields.push:   ISP::Server::Reporter::Field.new(:name('Date/Time First Data Sent'),    :alignment('r'))    if $detailed;
-    @fields.push:   ISP::Server::Reporter::Field.new(:name('Proxy By Storage Agent'),       :alignment('r'))    if $detailed;
-    @fields.push:   ISP::Server::Reporter::Field.new(:name('Actions'),                      :alignment('r'))    if $detailed;
-    @fields.push:   ISP::Server::Reporter::Field.new(:name('Failover Mode'),                :alignment('r'))    if $detailed;
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Proxy By Storage Agent'),       :alignment('c'))    if $detailed;
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Actions'),                      :alignment('c'))    if $detailed;
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Failover Mode'),                :alignment('c'))    if $detailed;
     my $reporter    = Reporter.new(
                                     :$isp-server,
                                     :$isp-admin,
@@ -127,6 +129,7 @@ sub MAIN (
                                     :@command,
                                     :@fields,
                                     :$detailed,
+                                    :$client-name,
                                   );
 #dd $reporter;
     $reporter.loop;
