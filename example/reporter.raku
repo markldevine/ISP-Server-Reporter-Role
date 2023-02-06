@@ -1,5 +1,6 @@
 #!/usr/bin/env raku
 
+use lib '/home/mdevine/github.com/ISP-Server-Reporter-Role/lib';
 use ISP::Server::Reporter;
 
 my regex date-time-regex    {
@@ -122,8 +123,10 @@ sub MAIN (
     my $reporter    = Reporter.new(
                                     :$isp-server,
                                     :$isp-admin,
-                                    :$interval,
                                     :$count,
+                                    :$grid,
+                                    :$clear,
+                                    :$interval,
                                     :title('IBM Spectrum Protect: ' ~ $isp-server ~ ' Sessions'),
                                     :@command,
                                     :@fields,
