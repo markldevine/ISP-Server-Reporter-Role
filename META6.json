@@ -1,0 +1,20 @@
+{
+  "auth": "zef:markldevine",
+  "authors": [ "Mark Devine <mark@markdevine.com>" ],
+  "depends": [
+  ],
+  "description": "ISP Server Reporter Role",
+  "license": "Artistic-2.0",
+  "meta-version": 0,
+  "name": "ISP::Server::Reporter",
+  "perl": "6.*",
+  "provides": {
+    "ISP::Server::Reporter": "lib/ISP/Server/Reporter.rakumod"
+  },
+  "resources": [],
+  "source-url": "https://github.com/markldevine/ISP-Server-Reporter.git",
+  "tags": [
+    "ISP"
+  ],
+  "version": "0.0.1"
+}
