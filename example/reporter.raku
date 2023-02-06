@@ -5,36 +5,6 @@ use lib '/home/mdevine/github.com/ISP-Server-Reporter-Role/lib';
 use ISP::Server::Reporter;
 use Prettier::Table;
 
-my @standard                    = [
-                                    'Sess Number',
-                                    'Comm. Method',
-                                    'Sess State',
-                                    'Wait Time',
-                                    'Bytes Sent',
-                                    'Bytes Recvd',
-                                    'Sess Type',
-                                    'Platform',
-                                    'Client Name',
-                                  ];
-
-my @detailed                    = [
-                                    'Sess Number',
-                                    'Comm. Method',
-                                    'Sess State',
-                                    'Wait Time',
-                                    'Bytes Sent',
-                                    'Bytes Recvd',
-                                    'Sess Type',
-                                    'Platform',
-                                    'Client Name',
-                                    'Media Access Status',
-                                    'User Name',
-                                    'Date/Time First Data Sent',
-                                    'Proxy By Storage Agent',
-                                    'Actions',
-                                    'Failover Mode',
-                                  ];
-
 my regex date-time-regex    {
                                 ^
                                 $<month>        = (\d\d)
@@ -51,40 +21,11 @@ my regex date-time-regex    {
                                 $
                             }
 
-sub MAIN (
-    Str:D   :$isp-server!,                          #= ISP server name
-    Str:D   :$isp-admin!,                           #= ISP server name
-    Bool    :$detailed,                             #= FORMAT=DETAILED
-    Str     :$node,                                 #= ISP NODE name
-    Int:D   :$interval      where * >= 5    = 58,   #= Refresh every --interval seconds (minimum 5s)
-    Int:D   :$count                         = 1,    #= Number of refreshes (0 is infinity)
-    Bool    :$grid,                                 #= Full table grid
-    Bool    :$clear,                                #= Clear the screen with each iteration
-) {
-    my $delay       = $interval;
-    my $counter     = $count;
-    my $infinity    = False;
-    if $counter == 0 {
-        $infinity   = True;
-        $counter++;
-    }
-    $delay          = 5                 if 0 < $delay < 5;
-    my @command     = ['QUERY', 'SESSION'];
-    @command.push:  'FORMAT=DETAILED'   if $detailed;
-    my @field-names = @standard;
-    @field-names    = @detailed         if $detailed;
-    my %align;
-    my %active-fields;
-    for @field-names -> $field-name {
-        %active-fields{$field-name} = 1;
-        %align{$field-name}         = 'l';
-    }
-    my $dsmadmc     = ISP::dsmadmc.new(:$isp-server, :$isp-admin);
-    my $table;
-    repeat {
-        my @sessions    = $dsmadmc.execute(@command);
-        die unless @sessions.elems;
+class Reporter does ISP::Server::Reporter {
 
+    has $.detailed;
+
+    method process-rows (@sessions) {
         my Str      $session-number;                                        ##                Sess Number: 29,057
         my Str      $communication-method;                                  ##               Comm. Method: SSL
         my Str      $session-state;                                         ##                 Sess State: RecvW
@@ -100,13 +41,6 @@ sub MAIN (
         my Str      $proxy-by-storage-agent;                                #      Proxy By Storage Agent:
         my Str      $actions;                                               #                     Actions: BkIns FSUpd
         my Str      $failover-mode;                                         #               Failover Mode: No
-
-        $table = Prettier::Table.new:
-            title => 'IBM Spectrum Protect: ' ~ $isp-server ~ ' Sessions [' ~ DateTime(now).local.hh-mm-ss ~ ']',
-            field-names => @field-names,
-            align       => %align,
-        ;
-        $table.hrules(Prettier::Table::Constrains::ALL) if $grid;
 
         my $row;
         for @sessions -> $session {
@@ -145,19 +79,57 @@ sub MAIN (
             $row.push:                      $session-type;
             $row.push:                      $platform;
             $row.push:                      $client-name;
-            $row.push:                      $media-access-status            if $detailed;
-            $row.push:                      $user-name                      if $detailed;
-            $row.push:                      $date-time-first-data-sent.Str  if $detailed;
-            $row.push:                      $proxy-by-storage-agent         if $detailed;
-            $row.push:                      $actions                        if $detailed;
-            $row.push:                      $failover-mode                  if $detailed;
-            $table.add-row:                 $row;
+            $row.push:                      $media-access-status            if self.detailed;
+            $row.push:                      $user-name                      if self.detailed;
+            $row.push:                      $date-time-first-data-sent.Str  if self.detailed;
+            $row.push:                      $proxy-by-storage-agent         if self.detailed;
+            $row.push:                      $actions                        if self.detailed;
+            $row.push:                      $failover-mode                  if self.detailed;
+            self.table.add-row:             $row;
         }
-        run '/usr/bin/clear'                if $clear;
-        put $table;
-        --$counter                          unless $infinity;
-        sleep $interval                     if $interval && $counter;
-    } until $counter < 1;
+    }
+}
+
+sub MAIN (
+    Str:D   :$isp-server!,                          #= ISP server name
+    Str:D   :$isp-admin!,                           #= ISP server name
+    Int:D   :$interval      where * >= 5    = 58,   #= Refresh every --interval seconds (minimum 5s)
+    Int:D   :$count                         = 1,    #= Number of refreshes (0 is infinity)
+    Bool    :$grid,                                 #= Full table grid
+    Bool    :$clear,                                #= Clear the screen with each iteration
+    Bool    :$detailed,                             #= FORMAT=DETAILED
+    Str     :$node,                                 #= ISP NODE name
+) {
+    my @command     = ['QUERY', 'SESSION'];
+    @command.push:  'FORMAT=DETAILED'   if $detailed;
+    my @fields;
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Sess Number'),                  :alignment('r'));
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Comm. Method'),                 :alignment('r'));
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Sess State'),                   :alignment('r'));
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Wait Time'),                    :alignment('r'));
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Bytes Sent'),                   :alignment('r'));
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Bytes Recvd'),                  :alignment('r'));
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Sess Type'),                    :alignment('r'));
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Platform'),                     :alignment('r'));
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Client Name'),                  :alignment('r'));
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Media Access Status'),          :alignment('r'))    if $detailed;
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('User Name'),                    :alignment('r'))    if $detailed;
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Date/Time First Data Sent'),    :alignment('r'))    if $detailed;
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Proxy By Storage Agent'),       :alignment('r'))    if $detailed;
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Actions'),                      :alignment('r'))    if $detailed;
+    @fields.push:   ISP::Server::Reporter::Field.new(:name('Failover Mode'),                :alignment('r'))    if $detailed;
+    my $reporter    = Reporter.new(
+                                    :$isp-server,
+                                    :$isp-admin,
+                                    :$interval,
+                                    :$count,
+                                    :title('IBM Spectrum Protect: ' ~ $isp-server ~ ' Sessions'),
+                                    :@command,
+                                    :@fields,
+                                    :$detailed,
+                                  );
+#dd $reporter;
+    $reporter.loop;
 }
 
 =finish
