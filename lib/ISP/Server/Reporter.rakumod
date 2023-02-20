@@ -16,6 +16,7 @@ has         $.title                             is required;
 has         @.command                           is required;
 has         @.fields                            is required;
 has         %.align;
+has         $.sort-by;
 
 method process-rows (Str:D $) { ... }
 
@@ -38,7 +39,7 @@ method loop () {
     repeat {
         my @records = $dsmadmc.execute(self.command);
         return Nil  unless @records.elems;
-        $!table = Prettier::Table.new: :title(self.title ~ ' [' ~ DateTime(now).local.hh-mm-ss ~ ']'), :@field-names, :%!align;
+        $!table = Prettier::Table.new: :title(self.title ~ ' [' ~ DateTime(now).local.hh-mm-ss ~ ']'), :@field-names, :%!align, :$!sort-by;
         $!table.hrules(Prettier::Table::Constrains::ALL) if self.grid;
         self.process-rows(@records);
         run '/usr/bin/clear'    if self.clear;
