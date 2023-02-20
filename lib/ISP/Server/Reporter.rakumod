@@ -36,7 +36,7 @@ method loop () {
         @field-names.push:      $field.name;
         %!align{$field.name}    = $field.alignment;
     }
-    $!sort-by       = @!fields[0] unless $!sort-by;
+    $!sort-by       = @!fields[0].name unless $!sort-by;
     repeat {
         my @records = $dsmadmc.execute(self.command);
         return Nil  unless @records.elems;
