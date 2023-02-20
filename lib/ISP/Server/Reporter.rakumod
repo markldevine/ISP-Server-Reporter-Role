@@ -36,15 +36,11 @@ method loop () {
         @field-names.push:      $field.name;
         %!align{$field.name}    = $field.alignment;
     }
+    $!sort-by       = @!fields[0] unless $!sort-by;
     repeat {
         my @records = $dsmadmc.execute(self.command);
         return Nil  unless @records.elems;
-        if $!sort-by {
-            $!table = Prettier::Table.new: :title(self.title ~ ' [' ~ DateTime(now).local.hh-mm-ss ~ ']'), :@field-names, :%!align, :$!sort-by;
-        }
-        else {
-            $!table = Prettier::Table.new: :title(self.title ~ ' [' ~ DateTime(now).local.hh-mm-ss ~ ']'), :@field-names, :%!align;
-        }
+        $!table = Prettier::Table.new: :title(self.title ~ ' [' ~ DateTime(now).local.hh-mm-ss ~ ']'), :@field-names, :%!align, :$!sort-by;
         $!table.hrules(Prettier::Table::Constrains::ALL) if self.grid;
         self.process-rows(@records);
         run '/usr/bin/clear'    if self.clear;
