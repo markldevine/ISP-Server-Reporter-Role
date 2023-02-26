@@ -18,6 +18,8 @@ has         @.fields                            is required;
 has         %.align;
 has Str     $.sort-by;
 
+has Int     $.seconds-offset-UTC;
+
 method process-rows (Str:D $) { ... }
 
 method loop () {
@@ -30,6 +32,7 @@ method loop () {
     }
     $delay          = 5         if $delay < 5;
     my $dsmadmc     = ISP::dsmadmc.new(:$!isp-server, :$!isp-admin);
+    $!seconds-offset-UTC = $dsmadmc.seconds-offset-UTC;
     my @field-names;
     my %align;
     for @!fields -> $field {
