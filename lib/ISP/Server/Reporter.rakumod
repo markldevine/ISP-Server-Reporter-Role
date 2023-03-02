@@ -82,8 +82,8 @@ method loop () {
         %!align{$field.name}    = $field.alignment;
     }
     $!sort-by       = @!fields[0].name unless $!sort-by;
+    $!first-iteration = DateTime(now);
     repeat {
-        $!first-iteration       = DateTime(now) without $!first-iteration;
         my @records = $dsmadmc.execute(self.command);
         return Nil  unless @records.elems;
         my $time    = ' [' ~ DateTime(now).local.hh-mm-ss;
