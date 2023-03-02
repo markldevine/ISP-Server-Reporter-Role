@@ -44,21 +44,23 @@ sub int-to-subscript (Int:D $i) {
     return $accumulator;
 }
 
-has Str:D   $.isp-server                        is required;
-has Str:D   $.isp-admin                         is required;
-has Int:D   $.interval                          = 58;
-has Int:D   $.count                             = 1;
-has Bool    $.grid;
-has Bool    $.clear;
+has DateTime    $.first-iteration;
 
-has         $.table;
-has         $.title                             is required;
-has         @.command                           is required;
-has         @.fields                            is required;
-has         %.align;
-has Str     $.sort-by;
+has Str:D       $.isp-server                        is required;
+has Str:D       $.isp-admin                         is required;
+has Int:D       $.interval                          = 58;
+has Int:D       $.count                             = 1;
+has Bool        $.grid;
+has Bool        $.clear;
 
-has Int     $.seconds-offset-UTC;
+has             $.table;
+has             $.title                             is required;
+has             @.command                           is required;
+has             @.fields                            is required;
+has             %.align;
+has Str         $.sort-by;
+
+has Int         $.seconds-offset-UTC;
 
 method process-rows (Str:D $) { ... }
 
@@ -81,6 +83,7 @@ method loop () {
     }
     $!sort-by       = @!fields[0].name unless $!sort-by;
     repeat {
+        $!first-iteration       = DateTime(now) without $!first-iteration;
         my @records = $dsmadmc.execute(self.command);
         return Nil  unless @records.elems;
         my $time    = ' [' ~ DateTime(now).local.hh-mm-ss;
