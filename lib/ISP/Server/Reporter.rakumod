@@ -2,47 +2,8 @@ unit role ISP::Server::Reporter:api<1>:auth<Mark Devine (mark@markdevine.com)>;
 
 use ISP::Server::Reporter::Field;
 use ISP::dsmadmc;
+use Our::Utilities;
 use Prettier::Table;
-
-my @SUB-DIGITS;
-@SUB-DIGITS[0]    = "\x[2080]";
-@SUB-DIGITS[1]    = "\x[2081]";
-@SUB-DIGITS[2]    = "\x[2082]";
-@SUB-DIGITS[3]    = "\x[2083]";
-@SUB-DIGITS[4]    = "\x[2084]";
-@SUB-DIGITS[5]    = "\x[2085]";
-@SUB-DIGITS[6]    = "\x[2086]";
-@SUB-DIGITS[7]    = "\x[2087]";
-@SUB-DIGITS[8]    = "\x[2088]";
-@SUB-DIGITS[9]    = "\x[2089]";
-
-my @SUPER-DIGITS;
-@SUPER-DIGITS[0]    = "\x[2070]";
-@SUPER-DIGITS[1]    = "\x[00B9]";
-@SUPER-DIGITS[2]    = "\x[00B2]";
-@SUPER-DIGITS[3]    = "\x[00B3]";
-@SUPER-DIGITS[4]    = "\x[2074]";
-@SUPER-DIGITS[5]    = "\x[2075]";
-@SUPER-DIGITS[6]    = "\x[2076]";
-@SUPER-DIGITS[7]    = "\x[2077]";
-@SUPER-DIGITS[8]    = "\x[2078]";
-@SUPER-DIGITS[9]    = "\x[2079]";
-
-sub int-to-superscript (Int:D $i) {
-    my $accumulator = '';
-    for $i.Int.comb -> $c {
-        $accumulator ~= @SUPER-DIGITS[$c.Int];
-    }
-    return $accumulator;
-}
-
-sub int-to-subscript (Int:D $i) {
-    my $accumulator = '';
-    for $i.Int.comb -> $c {
-        $accumulator ~= @SUB-DIGITS[$c.Int];
-    }
-    return $accumulator;
-}
 
 has DateTime    $.first-iteration;
 
@@ -92,7 +53,7 @@ method loop () {
             $time  ~= "\x[221E]";
         }
         elsif $counter > 1 {
-            $time  ~= "\x[02E3]" ~ int-to-superscript($counter - 1);
+            $time  ~= "\x[02E3]" ~ integer-to-superscript($counter - 1);
         }
         $time      ~= ' seconds' if $counter > 1 || $infinity;
         $time      ~= ']';

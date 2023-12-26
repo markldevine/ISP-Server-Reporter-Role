@@ -2,6 +2,7 @@
   "auth": "zef:markldevine",
   "authors": [ "Mark Devine <mark@markdevine.com>" ],
   "depends": [
+    "Our::Utilities"
   ],
   "description": "ISP Server Reporter Role",
   "license": "Artistic-2.0",
