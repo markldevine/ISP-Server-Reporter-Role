@@ -13,6 +13,7 @@ has Int:D       $.interval                          = 58;
 has Int:D       $.count                             = 1;
 has Bool        $.grid;
 has Bool        $.clear;
+has Bool        $.cache;
 
 has             $.table;
 has             $.title                             is required;
@@ -34,7 +35,7 @@ method loop () {
         $counter++;
     }
     $delay          = 5         if $delay < 5;
-    my $dsmadmc     = ISP::dsmadmc.new(:$!isp-server, :$!isp-admin);
+    my $dsmadmc     = ISP::dsmadmc.new(:$!isp-server, :$!isp-admin, :$!cache);
     $!seconds-offset-UTC = $dsmadmc.seconds-offset-UTC;
     my @field-names;
     my %align;
