@@ -46,8 +46,8 @@ method loop () {
     $!sort-by       = @!fields[0].name unless $!sort-by;
     $!first-iteration = DateTime(now);
     repeat {
-        my @records = $dsmadmc.execute(self.command);
-        return Nil  unless @records.elems;
+        my $records = $dsmadmc.execute(self.command);
+        return Nil  unless $records.elems;
         my $time    = ' [' ~ DateTime(now).local.hh-mm-ss;
         $time      ~= ' every ' ~ $!interval if $counter > 1 || $infinity;
         if $infinity {
@@ -60,7 +60,7 @@ method loop () {
         $time      ~= ']';
         $!table = Prettier::Table.new: :title(self.title ~ ' ' ~ $time), :@field-names, :%!align, :$!sort-by;
         $!table.hrules(Prettier::Table::Constrains::ALL) if self.grid;
-        self.process-rows(@records);
+        self.process-rows($records);
         run '/usr/bin/clear'    if self.clear;
         $!table.put;
         --$counter              unless $infinity;
