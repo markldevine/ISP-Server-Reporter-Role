@@ -1,0 +1,36 @@
+#!/usr/bin/env raku
+
+use lib '/home/mdevine/dev/roles/lib';
+use Reporter::Term::TablePrint;
+use Reporter::Prettier::Table;
+
+enum UI (
+#   ALIGNEDTXT  =>  'Reporter::Aligned::Text',
+    BORDERTXT   =>  'Reporter::Prettier::Table',
+#   CURSES      =>  'Reporter::Curses',
+#   CSV         =>  'Reporter::CSV',
+#   GRAPHICAL   =>  'Reporter::Graphical',
+    NAVTXT      =>  'Reporter::Term::TablePrint',
+);
+
+sub MAIN (
+    Str:D   :$isp-server!,                                  #= ISP server name
+    Str:D   :$isp-admin!,                                   #= ISP server name
+    Int:D   :$interval      where * >= 5    = 58,           #= Refresh every --interval seconds (minimum 5s)
+    Int:D   :$count                         = 1,            #= Number of refreshes (0 is infinity)
+    Bool    :$grid,                                         #= Full table grid
+    Bool    :$clear,                                        #= Clear the screen with each iteration
+    UI      :$ui                            = BORDERTXT;    #= User interface
+) {
+    my $reporter    = ::($ui.value).new(
+                        :$clear,
+                        :$count,
+                        :$grid,
+                        :$interval,
+                        :$isp-admin,
+                        :$isp-server,
+                        :title('Sample Title'),
+                      );
+}
+
+=finish
