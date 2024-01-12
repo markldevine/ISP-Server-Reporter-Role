@@ -1,6 +1,6 @@
 #!/usr/bin/env raku
 
-use lib '/home/mdevine/dev/roles/lib';
+use lib '/home/mdevine/github.com/ISP-Server-Reporter-Role/example/roles/lib';
 use Reporter::Term::TablePrint;
 use Reporter::Prettier::Table;
 
