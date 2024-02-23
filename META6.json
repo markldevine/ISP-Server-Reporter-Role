@@ -12,8 +12,7 @@
   "name": "ISP::Server::Reporter",
   "perl": "6.*",
   "provides": {
-    "ISP::Server::Reporter": "lib/ISP/Server/Reporter.rakumod",
-    "ISP::Server::Reporter::Field": "lib/ISP/Server/Reporter/Field.rakumod"
+    "ISP::Server::Reporter": "lib/ISP/Server/Reporter.rakumod"
   },
   "resources": [],
   "source-url": "https://github.com/markldevine/ISP-Server-Reporter.git",

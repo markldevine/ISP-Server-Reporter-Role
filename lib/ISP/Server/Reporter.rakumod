@@ -1,10 +1,8 @@
 unit role ISP::Server::Reporter:api<1>:auth<Mark Devine (mark@markdevine.com)>;
 
-use ISP::Server::Reporter::Field;
 use ISP::dsmadmc;
 use Our::Grid;
 use Our::Utilities;
-#use Prettier::Table;
 
 has DateTime    $.first-iteration;
 
@@ -12,17 +10,19 @@ has Str:D       $.isp-server                        is required;
 has Str:D       $.isp-admin                         is required;
 has Int:D       $.interval                          = 58;
 has Int:D       $.count                             = 1;
+has Bool        $.cache;
 has Bool        $.clear;
-
 has Our::Grid   $.grid;
 has             $.title                             is required;
 has             @.command                           is required;
-has             @.fields                            is required;
-has             %.align;
-has Str         $.sort-by;
 
 has Int         $.seconds-offset-UTC;
 
+submethod TWEAK {
+    $!grid     .= new;
+    self.process-headings;
+}
+method process-headings (Str:D $) { ... }
 method process-rows (Str:D $) { ... }
 
 method loop () {
@@ -34,7 +34,7 @@ method loop () {
         $counter++;
     }
     $delay          = 5         if $delay < 5;
-    my $dsmadmc     = ISP::dsmadmc.new(:$!isp-server, :$!isp-admin);
+    my $dsmadmc     = ISP::dsmadmc.new(:$!isp-server, :$!isp-admin, :$!cache);
     $!seconds-offset-UTC = $dsmadmc.seconds-offset-UTC;
     $!first-iteration = DateTime(now);
     repeat {
@@ -50,10 +50,12 @@ method loop () {
         }
         $time      ~= ' seconds' if $counter > 1 || $infinity;
         $time      ~= ']';
-        $!grid .= new: :title(self.title ~ ' ' ~ $time);
+        $!grid.title = self.title ~ ' ' ~ $time;
         self.process-rows(@records);
         run '/usr/bin/clear'    if self.clear;
         $!grid.ANSI-print;
+        $!grid     .= new;
+        $!grid.process-headings;
         --$counter              unless $infinity;
         sleep self.interval     if self.interval && $counter;
     } until $counter < 1;
