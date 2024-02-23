@@ -55,7 +55,7 @@ method loop () {
         run '/usr/bin/clear'    if self.clear;
         $!grid.ANSI-print;
         $!grid     .= new;
-        $!grid.process-headings;
+        self.process-headings;
         --$counter              unless $infinity;
         sleep self.interval     if self.interval && $counter;
     } until $counter < 1;
