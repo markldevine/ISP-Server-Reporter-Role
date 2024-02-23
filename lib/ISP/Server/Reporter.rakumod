@@ -43,10 +43,12 @@ method loop () {
         my $time    = ' [' ~ DateTime(now).local.hh-mm-ss;
         $time      ~= ' every ' ~ $!interval if $counter > 1 || $infinity;
         if $infinity {
-            $time  ~= "\x[221E]";
+#           $time  ~= "\x[221E]";
+            $time  ~= ouc-infinity.value;
         }
         elsif $counter > 1 {
-            $time  ~= "\x[02E3]" ~ integer-to-superscript($counter - 1);
+#           $time  ~= "\x[02E3]" ~ integer-to-superscript($counter - 1);
+            $time  ~= ouc-superscript-x ~ integer-to-superscript($counter - 1);
         }
         $time      ~= ' seconds' if $counter > 1 || $infinity;
         $time      ~= ']';
