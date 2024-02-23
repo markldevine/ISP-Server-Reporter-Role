@@ -2,6 +2,8 @@
   "auth": "zef:markldevine",
   "authors": [ "Mark Devine <mark@markdevine.com>" ],
   "depends": [
+    "ISP::dsmadmc",
+    "Our::Grid",
     "Our::Utilities"
   ],
   "description": "ISP Server Reporter Role",
