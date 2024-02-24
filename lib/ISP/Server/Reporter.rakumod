@@ -15,6 +15,7 @@ has Bool        $.clear;
 has Our::Grid   $.grid;
 has             $.title                             is required;
 has             @.command                           is required;
+has             @.sort-columns;
 
 has Int         $.seconds-offset-UTC;
 
@@ -43,11 +44,9 @@ method loop () {
         my $time    = ' [' ~ DateTime(now).local.hh-mm-ss;
         $time      ~= ' every ' ~ $!interval if $counter > 1 || $infinity;
         if $infinity {
-#           $time  ~= "\x[221E]";
             $time  ~= ouc-infinity.value;
         }
         elsif $counter > 1 {
-#           $time  ~= "\x[02E3]" ~ integer-to-superscript($counter - 1);
             $time  ~= ouc-superscript-x ~ integer-to-superscript($counter - 1);
         }
         $time      ~= ' seconds' if $counter > 1 || $infinity;
@@ -55,6 +54,7 @@ method loop () {
         $!grid.title = self.title ~ ' ' ~ $time;
         self.process-rows(@records);
         run '/usr/bin/clear'    if self.clear;
+        $!grid.sort-by-columns(:@!sort-columns) if @!sort-columns.elems;
         $!grid.ANSI-print;
         $!grid     .= new;
         self.process-headings;
