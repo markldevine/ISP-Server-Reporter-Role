@@ -16,6 +16,7 @@ has Our::Grid   $.grid;
 has             $.title                             is required;
 has             @.command                           is required;
 has             @.sort-columns;
+has Bool        $.tui;
 
 has Int         $.seconds-offset-UTC;
 
@@ -55,7 +56,10 @@ method loop () {
         self.process-rows(@records);
         run '/usr/bin/clear'    if self.clear;
         $!grid.sort-by-columns(:@!sort-columns) if @!sort-columns.elems;
-        $!grid.ANSI-print;
+        {
+            when self.tui   { $!grid.tui;           }
+            default         { $!grid.ANSI-print;    }
+        }
         $!grid     .= new;
         self.process-headings;
         --$counter              unless $infinity;
