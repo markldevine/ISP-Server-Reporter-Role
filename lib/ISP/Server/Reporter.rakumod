@@ -16,7 +16,6 @@ has Our::Grid   $.grid;
 has             $.title                             is required;
 has             @.command                           is required;
 has             @.sort-columns;
-has Bool        $.tui;
 has Bool        $.csv;
 has Bool        $.gui;
 has Bool        $.html;
