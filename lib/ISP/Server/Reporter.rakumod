@@ -51,7 +51,7 @@ method loop () {
         }
         $time      ~= ' seconds' if $counter > 1 || $infinity;
         $time      ~= ']';
-        $!grid.title = self.title ~ ' ' ~ $time;
+        $!grid.title(self.title ~ ' ' ~ $time);
         self.process-rows(@records);
         run '/usr/bin/clear'    if self.clear;
         $!grid.sort-by-columns(:@!sort-columns) if @!sort-columns.elems;
