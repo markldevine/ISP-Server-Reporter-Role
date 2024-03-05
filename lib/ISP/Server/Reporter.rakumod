@@ -17,6 +17,13 @@ has             $.title                             is required;
 has             @.command                           is required;
 has             @.sort-columns;
 has Bool        $.tui;
+has Bool        $.csv;
+has Bool        $.gui;
+has Bool        $.html;
+has Bool        $.json;
+has Bool        $.text;
+has Bool        $.tui;
+has Bool        $.xml;
 
 has Int         $.seconds-offset-UTC;
 
@@ -57,8 +64,14 @@ method loop () {
         run '/usr/bin/clear'    if self.clear;
         $!grid.sort-by-columns(:@!sort-columns) if @!sort-columns.elems;
         {
-            when self.tui   { $!grid.tui;           }
-            default         { $!grid.ANSI-print;    }
+            when    $!csv   { $grid.csv-print   }
+            when    $!gui   { $grid.GUI         }
+            when    $!html  { $grid.html-print  }
+            when    $!json  { $grid.json-print  }
+            when    $!text  { $grid.TEXT-print  }
+            when    $!tui   { $grid.TUI         }
+            when    $!xml   { $grid.xml-print   }
+            default         { $grid.ANSI-print  }
         }
         $!grid     .= new;
         self.process-headings;
