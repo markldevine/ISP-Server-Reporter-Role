@@ -63,13 +63,13 @@ method loop () {
         run '/usr/bin/clear'    if self.clear;
         $!grid.sort-by-columns(:@!sort-columns) if @!sort-columns.elems;
         {
-            when    $!csv   { $!grid.csv-print                          }
+            when    $!csv   { $!grid.CSV-print                          }
             when    $!gui   { $!grid.GUI; $!interval = 0; $counter = 0; }
-            when    $!html  { $!grid.html-print                         }
-            when    $!json  { $!grid.json-print                         }
+            when    $!html  { $!grid.HTML-print                         }
+            when    $!json  { $!grid.JSON-print                         }
             when    $!text  { $!grid.TEXT-print                         }
             when    $!tui   { $!grid.TUI; $!interval = 0; $counter = 0; }
-            when    $!xml   { $!grid.xml-print                          }
+            when    $!xml   { $!grid.XML-print                          }
             default         { $!grid.ANSI-print                         }
         }
         $!grid     .= new;
